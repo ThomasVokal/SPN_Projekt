@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Siemens Einkauf – Produktsuche</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: 'SiemensSans';
+    src: url('./fonts/SiemensSans-Regular.woff2') format('woff2'),
+         url('./fonts/SiemensSans-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'SiemensTypeface';
+    src: url('https://fonts.siemens.com/SiemensTypeface-Light.woff2') format('woff2'),
+         url('https://fonts.siemens.com/SiemensTypeface-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'SiemensTypeface';
+    src: url('https://fonts.siemens.com/SiemensTypeface-Roman.woff2') format('woff2'),
+         url('https://fonts.siemens.com/SiemensTypeface-Roman.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .siemens-font {
+    font-family: 'SiemensTypeface', 'SiemensSans', 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    letter-spacing: 1.2px;
+  }
+
+  details {
+    margin-bottom: 1rem;
+  }
+
+  summary {
+    cursor: pointer;
+    outline: none;
+  }
+
+  .dropdown-card {
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    background-color: #fff;
+  }
+
+  .checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .input-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .input-group i {
+    min-width: 1.5rem;
+    text-align: center;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .export-section {
+    margin-top: 1rem;
+  }
+
+  /* Neu: Styling für Info-Button und Info-Boxen */
+  .info-toggle-btn {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background-color: #0072c6;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000;
+    transition: background-color 0.3s;
+  }
+
+  .info-toggle-btn:hover {
+    background-color: #005ea1;
+  }
+
+  .info-box {
+    background-color: #f9f9f9;
+    border: 1px solid #0072c6;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    animation: fadeIn 0.5s;
+  }
+
+  .info-box i {
+    color: #0072c6;
+    font-size: 1.5rem;
+  }
+
+  .info-box div {
+    flex: 1;
+  }
+
+  .info-box.info-hide {
+    display: none;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animated-in {
+    animation: fadeIn 0.9s forwards;
+  }
+</style>
+</head>
+<body>
+<!-- Info-Button global oben rechts -->
+<button id="infoBtn" title="Informationen ein-/ausblenden" class="info-toggle-btn">
+  <i class="fas fa-info-circle"></i>
+</button>
+<header>
+  <div class="header-content">
+    <h1 class="siemens-font"><i class="fas fa-search"></i> SIEMENS Einkauf – Produktsuche</h1>
+    <div class="header-accent"></div>
+  </div>
+</header>
+
+<main class="container">
+  <section class="main-content">
+    <!-- Info-Box: Angezeigte Informationen -->
+    <div class="info-box" data-infosection="angezeigte-infos">
+      <i class="fas fa-info-circle"></i>
+      <div>
+        In diesem Bereich kann ausgewählt werden, welche Zusatzinformationen (z.&nbsp;B. Bestellnummer, Lieferant, Preis) in den Produktboxen angezeigt werden. Die Auswahl wirkt sich direkt auf die unten dargestellten Produkte aus.
+      </div>
+    </div>
+    <details class="card dropdown-card">
+      <summary><h3><i class="fas fa-eye"></i> Angezeigte Informationen</h3></summary>
+      <div class="checkbox-grid">
+        <label><input type="checkbox" id="showBestellnummer" checked> <span>Bestellnummer</span></label>
+        <label><input type="checkbox" id="showLiefermaterialNummer" checked> <span>Liefermaterial-Nr.</span></label>
+        <label><input type="checkbox" id="showLieferant" checked> <span>Lieferant</span></label>
+        <label><input type="checkbox" id="showPreis" checked> <span>Preis</span></label>
+        <label><input type="checkbox" id="showLieferdatum" checked> <span>Lieferdatum</span></label>
+        <label><input type="checkbox" id="showOrt" checked> <span>Ort</span></label>
+      </div>
+    </details>
+
+    <!-- Info-Box: Suchwörter verwalten -->
+    <div class="info-box" data-infosection="suchwoerter-verwalten">
+      <i class="fas fa-info-circle"></i>
+      <div>
+        Hier können neue Suchwörter mit passenden Kategorien hinzugefügt oder bestehende gelöscht werden. Die Suchwörter sind funktional: Existiert ein Suchwort in der Liste, kann es im Bereich <b>Filter &amp; Suche</b> verwendet werden. <br>
+        Änderungen gelten nur für die aktuelle Sitzung und werden beim Neuladen der Seite zurückgesetzt. (Also gerne alles ausprobieren, man kann nichts kaputt machen)
+      </div>
+    </div>
+    <details class="card dropdown-card">
+      <summary><h3><i class="fas fa-list"></i> Suchwörter verwalten</h3></summary>
+      <ul id="searchwordList" style="margin-bottom:1rem;"></ul>
+      <form id="addSearchwordForm" style="display:flex;flex-direction:column;gap:0.5rem;">
+        <input type="text" id="newSearchwordInput" placeholder="Neues Suchwort" required>
+        <select id="newCat1Select" required>
+          <option value="">Kategorie 1 wählen...</option>
+        </select>
+        <select id="newCat2Select" required>
+          <option value="">Kategorie 2 wählen...</option>
+        </select>
+        <button type="submit" class="btn-primary" style="padding:0.5rem 1rem;font-size:0.95rem;"><i class="fas fa-plus"></i> Hinzufügen</button>
+      </form>
+      <div class="export-section">
+        <button id="exportBtn" class="btn-export" onclick="showExportNotification()">
+          <i class="fas fa-file-excel"></i> Suchwörter nach Excel exportieren
+        </button>
+        <div class="info-box info-box-inline" data-infosection="export-sidebar">
+          <i class="fas fa-info-circle"></i>
+          Auch dieser Export-Button ist nur zur Demo und erzeugt keine echte Datei.
+        </div>
+      </div>
+    </details>
+    
+    <!-- Info-Box: Filter & Suche -->
+    <div class="info-box" data-infosection="filter-suche">
+      <i class="fas fa-info-circle"></i>
+      <div>
+        Mit den folgenden Filtern kann gezielt nach Produkten gesucht werden. Es können mehrere Filter gleichzeitig gesetzt werden (Firma, Bereich, Jahr, Suchwort, Kategorien usw.). <br>
+        Im Feld <b>Suchindex</b> kann ein Begriff eingegeben werden (z.&nbsp;B. "Kabel"), woraufhin rechts passende Suchwörter als Vorschläge erscheinen. Bei Klick auf diese empfohlenen Suchwörter werden diese automatisch in die Filterung eingesetzt. Die Suchwörter aus der Verwaltung stehen ebenfalls zur Auswahl. <br>
+        Alle Filteroptionen können beliebig kombiniert und ausprobiert werden. Falls mal nichts als Ergebnis kommt, liegt es daran dass nicht alle Kombinationen für ein Ergebnis zutreffen. Die Einstellungen lassen sich jederzeit zurücksetzen.
+      </div>
+    </div>
+    <form id="filterPanel" class="card">
+      <h3><i class="fas fa-filter"></i> Filter & Suche</h3>
+      <div class="filter-grid">
+        <div class="input-group">
+          <i class="fas fa-building"></i>
+          <select id="firmaSelect">
+            <option value="">Firma wählen…</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-sitemap"></i>
+          <select id="bereichSelect">
+            <option value="">Bereich wählen…</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-calendar"></i>
+          <select id="jahrSelect">
+            <option value="">Jahr wählen…</option>
+          </select>
+        </div>
+
+
+
+        <div class="input-group">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchIndexInput" placeholder="Suchindex (Produktname)">
+        </div>
+        <div class="input-group">
+          <i class="fas fa-tag"></i>
+          <select id="searchwordSelect">
+            <option value="">Suchwort wählen...</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-folder"></i>
+          <select id="cat1Select">
+            <option value="">Kategorie 1 wählen...</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-folder-open"></i>
+          <select id="cat2Select">
+            <option value="">Kategorie 2 wählen...</option>
+          </select>
+        </div>
+      </div>
+      <div class="button-group">
+        <button type="submit" class="btn-primary"><i class="fas fa-search"></i> Filtern</button>
+        <button type="button" id="resetBtn" class="btn-secondary"><i class="fas fa-undo"></i> Zurücksetzen</button>
+      </div>
+    </form>
+
+    <!-- Info-Box: Export -->
+    <div class="info-box" data-infosection="export">
+      <i class="fas fa-info-circle"></i>
+      <div>
+        Die Schaltfläche <i class="fas fa-file-excel"></i> <b>Ergebnisse nach Excel exportieren</b> dient nur zur Veranschaulichung und ist nicht funktional.
+      </div>
+    </div>
+    <div class="results-export-section">
+      <button id="exportResultsBtn" class="btn-export" onclick="showExportNotification()">
+        <i class="fas fa-file-excel"></i> Ergebnisse nach Excel exportieren
+      </button>
+    </div>
+
+    <!-- Info-Box: Produktliste -->
+    <div class="info-box" data-infosection="produktliste">
+      <i class="fas fa-info-circle"></i>
+      <div>
+        Die unten angezeigten Produkte entsprechen den aktuellen Filtereinstellungen. Je nach Auswahl werden mehr oder weniger Details angezeigt.
+      </div>
+    </div>
+    <div id="productList" class="results-section">
+    </div>
+  </section>
+  <aside class="sidebar">
+    <!-- Info-Box: Suchwort-Vorschläge -->
+    <div class="info-box" data-infosection="suchwort-vorschlaege">
+      <i class="fas fa-info-circle"></i>
+      <div>
+        Sobald im <b>Suchindex</b> ein Begriff eingegeben wird, erscheinen hier passende Suchwörter aus der aktuellen Liste. Ein Klick auf einen Vorschlag übernimmt das Suchwort direkt in die Filter.
+      </div>
+    </div>
+    <div id="keywordSuggestions" class="card">
+      <h3><i class="fas fa-lightbulb"></i> Ähnliche Suchwörter</h3>
+      <div id="suggestionList"></div>
+    </div>
+  </aside>
+</main>
+<script src="script.js" defer></script>
+<script>
+  // Info-Boxen animiert ein-/ausblenden, gestaffelt beim Einblenden/Ausblenden
+  document.addEventListener("DOMContentLoaded", function() {
+    var infoBtn = document.getElementById("infoBtn");
+    var infoBoxes = Array.from(document.querySelectorAll('.info-box'));
+    var infoVisible = false; // Standard: ausgeblendet
+    function hideAllInfoBoxes() {
+      infoBoxes.forEach(function(box) {
+        box.classList.add("info-hide");
+        box.classList.remove("animated-in", "animated-out");
+      });
+      infoBtn.classList.remove("info-active");
+    }
+    function showAllInfoBoxes() {
+      infoBoxes.forEach(function(box, idx) {
+        setTimeout(function() {
+          box.classList.remove("info-hide", "animated-out");
+          box.classList.add("animated-in");
+          setTimeout(() => box.classList.remove("animated-in"), 700);
+        }, idx * 110);
+      });
+      infoBtn.classList.add("info-active");
+    }
+    infoBtn.addEventListener("click", function() {
+      infoVisible = !infoVisible;
+      if (infoVisible) {
+        showAllInfoBoxes();
+      } else {
+        infoBoxes.forEach(function(box, idx) {
+          setTimeout(function() {
+            box.classList.remove("animated-in");
+            box.classList.add("animated-out");
+            setTimeout(() => {
+              box.classList.add("info-hide");
+              box.classList.remove("animated-out");
+            }, 550);
+          }, idx * 80);
+        });
+        infoBtn.classList.remove("info-active");
+      }
+    });
+    // Initial: alle ausgeblendet
+    hideAllInfoBoxes();
+  });
+</script>
+</body>
+</html>
